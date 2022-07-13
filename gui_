@@ -3,7 +3,13 @@ from rec_math import *
 import math
 
 class GUI:
-    def __init__(self, window):
+    """
+    A class representing details for a math calculator application via using multiple functions below.
+    """
+    def __init__(self, window: None) -> None:
+        """
+        Constructor to create initial state of a GUI.
+        """
         self.window = window
         self.frame_choose = Frame(self.window)
         self.label_choose = Label(self.frame_choose, text='Select', fg='#00FF00')
@@ -12,7 +18,7 @@ class GUI:
 
         self.radio_buttons = IntVar()
         self.radio_buttons.set(-99)
-        options = ['Sigma', 'Exponent', 'Factorial']
+        options: list = ['Sigma', 'Exponent', 'Factorial']
         for i in range(len(options)):
             self.type_buttons = Radiobutton(self.frame_choose, text=options[i], variable=self.radio_buttons, value=i)
             self.type_buttons.pack(side='left')
@@ -22,19 +28,29 @@ class GUI:
         self.button_confirm.pack(pady=30)
         self.frame_buttons.pack(side='bottom')
 
-    def confirm(self):
+    def confirm(self) -> None:
+        """
+        Method to create and modify a new GUI window from the provided user's initial input.
+        """
         global popup
         popup = Toplevel(self.window)
         popup.geometry("250x200")
         popup.title("")
         self.frame_hidden = Frame(popup)
         self.frame_num = Frame(popup)
-        radio = self.radio_buttons.get()
-        if radio == 0 or radio == 2:
+        radio: int = self.radio_buttons.get()
+        if radio == 2:
             self.label_header = Label(self.frame_hidden, text='Enter a number:', fg='#00FF00')
             self.label_header.pack(pady=10)
             self.entry_num = Entry(self.frame_num)
             self.entry_num.pack()
+        elif radio == 0:
+            self.label_header = Label(self.frame_hidden, text='Enter a number and range:', fg='#00FF00')
+            self.label_header.pack(pady=10)
+            self.entry_num4 = Entry(self.frame_num)
+            self.entry_num5 = Entry(self.frame_num)
+            self.entry_num4.pack()
+            self.entry_num5.pack(pady=10)
         else:
             self.label_header2 = Label(self.frame_hidden, text='Enter base and power:', fg='#00FF00')
             self.label_header2.pack(pady=10)
@@ -52,50 +68,78 @@ class GUI:
         self.button_reset.pack(pady=10)
         self.button_popup.pack(side='bottom')
 
-    def calc(self):
+    def calc(self) -> int and str:
+        """
+        Method to determine and modify the canvas of the newly created GUI window with new information (math related)
+        from the provided user's input.
+        """
         global frame_ans
         self.frame_ans = Frame(popup)
         radio = self.radio_buttons.get()
         try:
-            if radio == 0 or radio == 2:
-                num = self.entry_num.get()
-                num = int(num)
-                if radio == 0:
-                    s = math.floor(sigma(float(int(num))))
-                    with open('math_recorded', 'a') as file:
-                        file.write(f'\nSigma, {num}, {int(s)}')
-                    self.label_ans = Label(self.frame_ans, text=f'Answer = {s}', fg='#00FF00')
-                else:
-                    f = math.floor(factorial(float(int(num))))
-                    with open('math_recorded', 'a') as file:
-                        file.write(f'\nFactorial, {num}, {int(f)}')
-                    self.label_ans = Label(self.frame_ans, text=f'Answer = {f}', fg='#00FF00')
+            if radio == 0:
+                begin: str = self.entry_num4.get()
+                end: str = self.entry_num5.get()
+                begin: int = int(begin)
+                end: int = int(end)
+                if begin <= end:
+                    raise IndexError
+                s: int = math.floor(sigma(float(int(begin)), float(int(end))))
+                with open('math_recorded', 'a') as file:
+                    file.write(f'\nSigma, {begin} to {end}, {s}')
+                self.label_ans = Label(self.frame_ans, text=f'Answer {begin} to {end} = {s}', fg='#00FF00')
+                self.label_ans.pack()
+                self.frame_ans.pack()
+            elif radio == 2:
+                num: str = self.entry_num.get()
+                num: int = int(num)
+                f: int = math.floor(factorial(float(int(num))))
+                with open('math_recorded', 'a') as file:
+                    file.write(f'\nFactorial, {num}, {int(f)}')
+                self.label_ans = Label(self.frame_ans, text=f'Answer = {f}', fg='#00FF00')
                 self.label_ans.pack(pady=35)
                 self.frame_ans.pack()
             else:
-                base = self.entry_num2.get()
-                power = self.entry_num3.get()
-                base = int(base)
-                power = int(power)
-                e = math.floor(exponent(float(int(base)), float(int(power))))
+                base: str = self.entry_num2.get()
+                power: str = self.entry_num3.get()
+                base: int = int(base)
+                power: int = int(power)
+                e: int = math.floor(exponent(float(int(base)), float(int(power))))
                 with open('math_recorded', 'a') as file:
                     file.write(f'\nExponent, {base}^{power}, {e}')
                 self.label_ans = Label(self.frame_ans, text=f'Answer {base}^{power} = {e}', fg='#00FF00')
                 self.label_ans.pack()
                 self.frame_ans.pack()
+        except IndexError:
+            error = Toplevel(self.window)
+            error.geometry("225x55")
+            error.title("ERROR")
+            self.sign = Frame(error)
+            self.label_error = Label(self.sign, text="Range must be less than Number", fg='#FF0000')
+            self.label_error.pack()
+            self.sign.pack(pady=10, side="top")
+            error.after(3000, error.destroy)
         except:
             error = Toplevel(self.window)
             error.geometry("160x50")
+            error.title("ERROR")
             self.sign = Frame(error)
             self.label_error = Label(self.sign, text="Only Positive Integer(s)", fg='#FF0000')
             self.label_error.pack()
             self.sign.pack(pady=10, side="top")
             error.after(3000, error.destroy)
 
-    def reset(self):
-        radio = self.radio_buttons.get()
-        if radio == 0 or radio == 2:
+    def reset(self) -> int and str:
+        """
+        Method to reset and modify information currently on the canvas of the new GUI window that was formed by
+        the user's current input.
+        """
+        radio: int = self.radio_buttons.get()
+        if radio == 2:
             self.entry_num.delete(0, END)
+        elif radio == 0:
+            self.entry_num4.delete(0, END)
+            self.entry_num5.delete(0, END)
         else:
             self.entry_num2.delete(0, END)
             self.entry_num3.delete(0, END)
