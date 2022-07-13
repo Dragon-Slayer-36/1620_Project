@@ -1,0 +1,102 @@
+from tkinter import *
+from rec_math import *
+import math
+
+class GUI:
+    def __init__(self, window):
+        self.window = window
+        self.frame_choose = Frame(self.window)
+        self.label_choose = Label(self.frame_choose, text='Select', fg='#00FF00')
+        self.label_choose.pack(pady=10, side='left')
+        self.frame_choose.pack(anchor='n', pady=10)
+
+        self.radio_buttons = IntVar()
+        self.radio_buttons.set(-99)
+        options = ['Sigma', 'Exponent', 'Factorial']
+        for i in range(len(options)):
+            self.type_buttons = Radiobutton(self.frame_choose, text=options[i], variable=self.radio_buttons, value=i)
+            self.type_buttons.pack(side='left')
+
+        self.frame_buttons = Frame(self.window)
+        self.button_confirm = Button(self.frame_buttons, text='CONFIRM', command=self.confirm, fg='#FF0000')
+        self.button_confirm.pack(pady=30)
+        self.frame_buttons.pack(side='bottom')
+
+    def confirm(self):
+        global popup
+        popup = Toplevel(self.window)
+        popup.geometry("250x200")
+        popup.title("")
+        self.frame_hidden = Frame(popup)
+        self.frame_num = Frame(popup)
+        radio = self.radio_buttons.get()
+        if radio == 0 or radio == 2:
+            self.label_header = Label(self.frame_hidden, text='Enter a number:', fg='#00FF00')
+            self.label_header.pack(pady=10)
+            self.entry_num = Entry(self.frame_num)
+            self.entry_num.pack()
+        else:
+            self.label_header2 = Label(self.frame_hidden, text='Enter base and power:', fg='#00FF00')
+            self.label_header2.pack(pady=10)
+            self.entry_num2 = Entry(self.frame_num)
+            self.entry_num3 = Entry(self.frame_num)
+            self.entry_num2.pack()
+            self.entry_num3.pack(pady=10)
+        self.frame_hidden.pack(anchor='n')
+        self.frame_num.pack(anchor='n')
+
+        self.button_popup = Frame(popup)
+        self.button_calc = Button(self.button_popup, text="Calculate", command=self.calc, fg='#0000FF')
+        self.button_reset = Button(self.button_popup, text="Reset", command=self.reset, fg='#FF0000')
+        self.button_calc.pack(pady=10, side='left')
+        self.button_reset.pack(pady=10)
+        self.button_popup.pack(side='bottom')
+
+    def calc(self):
+        global frame_ans
+        self.frame_ans = Frame(popup)
+        radio = self.radio_buttons.get()
+        try:
+            if radio == 0 or radio == 2:
+                num = self.entry_num.get()
+                num = int(num)
+                if radio == 0:
+                    s = math.floor(sigma(float(int(num))))
+                    with open('math_recorded', 'a') as file:
+                        file.write(f'\nSigma, {num}, {int(s)}')
+                    self.label_ans = Label(self.frame_ans, text=f'Answer = {s}', fg='#00FF00')
+                else:
+                    f = math.floor(factorial(float(int(num))))
+                    with open('math_recorded', 'a') as file:
+                        file.write(f'\nFactorial, {num}, {int(f)}')
+                    self.label_ans = Label(self.frame_ans, text=f'Answer = {f}', fg='#00FF00')
+                self.label_ans.pack(pady=35)
+                self.frame_ans.pack()
+            else:
+                base = self.entry_num2.get()
+                power = self.entry_num3.get()
+                base = int(base)
+                power = int(power)
+                e = math.floor(exponent(float(int(base)), float(int(power))))
+                with open('math_recorded', 'a') as file:
+                    file.write(f'\nExponent, {base}^{power}, {e}')
+                self.label_ans = Label(self.frame_ans, text=f'Answer {base}^{power} = {e}', fg='#00FF00')
+                self.label_ans.pack()
+                self.frame_ans.pack()
+        except:
+            error = Toplevel(self.window)
+            error.geometry("160x50")
+            self.sign = Frame(error)
+            self.label_error = Label(self.sign, text="Only Positive Integer(s)", fg='#FF0000')
+            self.label_error.pack()
+            self.sign.pack(pady=10, side="top")
+            error.after(3000, error.destroy)
+
+    def reset(self):
+        radio = self.radio_buttons.get()
+        if radio == 0 or radio == 2:
+            self.entry_num.delete(0, END)
+        else:
+            self.entry_num2.delete(0, END)
+            self.entry_num3.delete(0, END)
+        self.frame_ans.destroy()
