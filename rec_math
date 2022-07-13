@@ -1,0 +1,17 @@
+def sigma(num):
+    if num == 1:
+        return 1
+    else:
+        return num + sigma(num - 1)
+
+def exponent(base, pow):
+    if pow == 1:
+        return base
+    else:
+        return base * exponent(base, pow - 1)
+
+def factorial(num):
+        if num == 1:
+            return 1
+        else:
+            return num * factorial(num - 1)
