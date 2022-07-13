@@ -1,0 +1,12 @@
+from gui_ import *
+
+def main():
+    window = Tk()
+    window.title('Limited Math Calculator')
+    window.geometry('350x150')
+    window.resizable(False, False)
+    widgets = GUI(window)
+    window.mainloop()
+
+if __name__ == '__main__':
+    main()
